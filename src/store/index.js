@@ -1,14 +1,13 @@
-import { createStore } from 'vuex'
-
+import { createStore } from 'vuex';
+import auth from './auth';
+import loader from './loader';
+import offline from './offline';
+import dairy from './modules/dairy';
 export default createStore({
-  state: {
-  },
-  getters: {
-  },
-  mutations: {
-  },
-  actions: {
-  },
   modules: {
-  }
-})
+    auth,
+    loader,
+    offline,
+    dairy
+  },
+});
