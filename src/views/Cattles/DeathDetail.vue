@@ -8,12 +8,70 @@
             <v-row>
               <v-col cols="12">
                 <v-text-field
-                  v-model="conclusion"
-                  label="Conclusion"
+                  v-model="reason"
+                  label="Reason of Death"
                   :rules="[rules.required]"
                   required
                 ></v-text-field>
+                <v-text-field
+                  v-model="place"
+                  label="Place of Death"
+                  :rules="[rules.required]"
+                  required
+                ></v-text-field>
+
+              <v-col>
+                <!-- From Date Picker -->
+                <v-menu
+                  v-model="lossDateMenu"
+                  activator="parent"
+                  transition="scale-transition"
+                  :close-on-content-click="false"
+                  max-width="300"
+                  offset-y
+                >
+                  <template #activator="{ props }">
+                    <v-text-field
+                      v-model="lossDateDisplay"
+                      label="Date of loss"
+                      readonly
+                      v-bind="props"
+                      @click="lossDateMenu = true"
+                      :error="lossDateError"
+                      required
+                    ></v-text-field>
+                  </template>
+                  <v-date-picker
+                    v-model="lossDate"
+                    show-adjacent-months
+                    scrollable
+                    @update:model-value="selectLossDate"
+                  ></v-date-picker>
+                </v-menu>
               </v-col>
+              <v-col>
+        <v-text-field
+          v-model="time"
+          :active="menu2"
+          :focus="menu2"
+          label="Time of Death"
+          readonly
+        >
+          <v-menu
+            v-model="menu2"
+            :close-on-content-click="false"
+            activator="parent"
+            transition="scale-transition"
+          >
+            <v-time-picker
+              v-if="menu2"
+              v-model="time"
+              full-width
+            ></v-time-picker>
+          </v-menu>
+        </v-text-field>
+              </v-col>
+      </v-col>
               <FileUpload
                 :leftPhoto="leftPhoto"
                 :rightPhoto="rightPhoto"
@@ -71,8 +129,15 @@ export default {
 
   data() {
     return {
-      conclusion: "",
+      reason: "",
+      place:"",
       valid: false,
+      lossDate: null, // Selected raw From Date
+      lossDateDisplay: "", // Formatted From Date
+      lossDateMenu: false, // From Date menu visibility
+      lossDateError: false, // Tracks validation for "From Date"
+       time: null,
+        menu2: false,
       leftPhoto: null,
       rightPhoto: null,
       frontPhoto: null,
@@ -107,12 +172,19 @@ export default {
         this.rightPhoto &&
         this.frontPhoto &&
         this.backPhoto &&
-        this.tagPhoto
+        this.tagPhoto&& this.lossDateDisplay&&this.reason&&this.place&&this.time
       );
     },
   },
 
   methods: {
+     selectLossDate(date) {
+      if (date) {
+        this.lossDate = date;
+        this.lossDateDisplay = new Date(date).toLocaleDateString("en-CA"); // Format date for display
+        this.lossDateMenu = false; // Close the calendar
+      }
+    },
     updateFile({ file, index }) {
       // Update the file for the corresponding index
       switch (index) {

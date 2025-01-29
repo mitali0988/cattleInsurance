@@ -46,9 +46,13 @@
       <p><strong>Value:</strong> {{ cattle.value }}</p>
     </v-col>
   </v-row>
-  <v-row v-if="cattle.conclusion">
+  <v-row v-if="cattle.death_reason">
     <v-col cols="12">
-      <p><strong>Conclusion:</strong> {{ cattle.conclusion }}</p>
+      <p><strong>Reason of death:</strong> {{ cattle.death_reason }}</p>
+      <p><strong>Place of death:</strong> {{ cattle.death_place }}</p>
+      <p><strong>Date of death:</strong> {{ cattle.death_date }}</p>
+      <p><strong>Time of death:</strong> {{ cattle.death_time }}</p>
+
     </v-col>
   </v-row>
   <v-row>

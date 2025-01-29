@@ -279,7 +279,11 @@ export default {
         (yPos += 10)
       );
       if (type == "Death") {
-        pdf.text(`Conclucion: ${this.cattle.conclusion}`, 20, (yPos += 10));
+        pdf.text(`Reason of death: ${this.cattle.death_reason}`, 20, (yPos += 10));
+        pdf.text(`Place of death: ${this.cattle.death_place}`, 20, (yPos += 10));
+        pdf.text(`Date of death: ${this.cattle.death_date}`, 20, (yPos += 10));
+        pdf.text(`Time of death: ${this.cattle.death_time}`, 20, (yPos += 10));
+
       }
 
       let yPos2 = 90; // starting position
