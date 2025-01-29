@@ -342,6 +342,9 @@ export default {
 
             loadedPhotos++;
             if (loadedPhotos === totalPhotos) {
+      pdf.text(this.user.registrationCode, 180, 270, { align: "center" });
+      pdf.text(this.user.name, 180, 280, { align: "center" });
+
               onComplete?.(); // Callback when all photos are loaded
             }
           };
@@ -350,6 +353,8 @@ export default {
 
       // Add a new page
       pdf.addPage();
+    
+
       //pdf.text("Photos:", x, (y += 10));
 
       // Access photos by category
@@ -359,7 +364,7 @@ export default {
         renderPhotos(
           pdf,
           photosByCategory["health certificate"],
-          "Initial Photos:",
+          "Health Certificate Photos:",
           20,
           y,
           true, // Horizontal layout
@@ -371,7 +376,7 @@ export default {
         renderPhotos(
           pdf,
           photosByCategory["health certificate"],
-          "Initial Photos:",
+          "Health Certificate Photos:",
           20,
           y,
           false, // Vertical layout
@@ -395,7 +400,7 @@ export default {
         renderPhotos(
           pdf,
           photosByCategory["health certificate"],
-          "Initial Photos:",
+          "Health Certificate Photos:",
           20,
           y,
           false, // Vertical layout
@@ -440,186 +445,6 @@ export default {
           }
         );
       }
-
-      /* let x = 20;
-      // Add a new page if the height exceeds the page
-      pdf.addPage();
-      let y = 5; // Reset position for the new page
-
-      pdf.text("Photos: ", x, (y += 10));
-      const photoWidth = 40;
-      const photoHeight = 40;
-      const spacing = 15;
-      //const pageWidth = 190;
-
-      const photosByCategory = this.cattle.photos;
-
-      if (fileType == "Health") {
-        let totalPhotos = Object.keys(
-          photosByCategory["health certificate"]
-        ).length;
-        let loadedPhotos = 0;
-        pdf.text("Inital Photos: ", x, (y += 10));
-        Object.entries(photosByCategory["health certificate"]).forEach(
-          ([type, photoURL]) => {
-            const img = new Image();
-            img.src = photoURL;
-
-            img.onload = () => {
-              pdf.text(type, x, y + 10); // Add type name above the photo
-              pdf.addImage(img, "JPEG", x, y + 20, photoWidth, photoHeight);
-              x += photoWidth + spacing;
-              if (x + photoWidth > 190) {
-                // Move to next row if the width exceeds the page
-                x = 20;
-                y += photoHeight + spacing;
-              }
-              loadedPhotos++;
-              if (loadedPhotos == totalPhotos) {
-                console.log("caleed");
-                this.savePDF(pdf, `${fileType} Certificate`);
-              }
-            };
-          }
-        );
-      }
-      if (fileType == "ReTag") {
-        pdf.text("Inital Photos: ", x, (y += 10));
-        let totalPhotos = Object.keys(
-          photosByCategory["health certificate"]
-        ).length;
-        let loadedPhotos = 0;
-
-        Object.entries(photosByCategory["health certificate"]).forEach(
-          ([type, photoURL]) => {
-            const img = new Image();
-            img.src = photoURL;
-
-            img.onload = () => {
-              pdf.text(type, x, y + 10); // Add type name above the photo
-              pdf.addImage(img, "JPEG", x, y + 15, photoWidth, photoHeight);
-              y += photoHeight + spacing;
-              loadedPhotos++;
-              if (loadedPhotos == totalPhotos) {
-                x = 100;
-                y = 25;
-                pdf.text("Retag Photos: ", x, y);
-                let totalPhotos1 = Object.keys(
-                  photosByCategory["ReTag certificate"]
-                ).length;
-                let loadedPhotos1 = 0;
-                Object.entries(photosByCategory["ReTag certificate"]).forEach(
-                  ([type, photoURL]) => {
-                    console.log("yyyyyyyyyyy", type);
-                    console.log("uuuuuuuuu", photoURL);
-                    const img = new Image();
-                    img.src = photoURL;
-
-                    img.onload = () => {
-                      console.log("cdfdfdfdf", x);
-                      console.log("mmmmmerereremmmmmm", y);
-                      pdf.text(type, x, y + 10); // Add type name above the photo
-                      pdf.addImage(
-                        img,
-                        "JPEG",
-                        x,
-                        y + 20,
-                        photoWidth,
-                        photoHeight
-                      );
-                      y += photoHeight + spacing;
-                      loadedPhotos1++;
-                      if (loadedPhotos1 == totalPhotos1) {
-                        console.log("caleed");
-                        this.savePDF(pdf, `${fileType} Certificate`);
-                      }
-                    };
-                  }
-                );
-              }
-            };
-          }
-        );
-      }
-      if (fileType == "Death") {
-        pdf.text("Inital Photos: ", x, (y += 10));
-        pdf.text("Retag Photos: ", x + 80, (y += 10));
-        pdf.text("final Photos: ", x + 80, (y += 10));
-      }
-      /*let allowedCategories = [];
-      if (fileType === "Health") {
-        allowedCategories = ["health certificate"];
-      } else if (fileType === "ReTag") {
-        allowedCategories = ["health certificate", "ReTag certificate"];
-      } else if (fileType === "Death") {
-        allowedCategories = [
-          "health certificate",
-          "ReTag certificate",
-          "Death Certificate",
-        ]; // All categories
-      }*/
-      /* const fileteredPhotos = photosByCategory.filter(([category]) =>
-        allowedCategories.includes(category)
-      );*/
-      // console.log("dddddddddddd", photosByCategory);
-
-      /*const filteredPhotos = Object.fromEntries(
-        Object.entries(photosByCategory).filter(([category]) =>
-          allowedCategories.includes(category)
-        )
-      );
-      let totalPhotos = filteredPhotos.length;
-      let loadedPhotos = 0;
-
-      Object.entries(filteredPhotos).forEach(([category, types]) => {
-        // Add category title
-        pdf.setFontSize(12);
-        pdf.text(`Category: ${category}`, x, y + 10); // Add some spacing above photos
-        // y += 10; // Shift Y slightly after the category title
-
-        // Reset X position for each category
-
-        // Loop through types within the category
-        console.log("category............", category);
-        console.log(x);
-        x = 20;
-        Object.entries(types).forEach(([type, photoUrl]) => {
-          const img = new Image();
-          img.src = photoUrl;
-
-          img.onload = () => {
-            console.log("type...........", type);
-            console.log(x);
-            // Add photo with title
-            pdf.text(type, x, y - 5); // Add type name above the photo
-            pdf.addImage(img, "JPEG", x, y, photoWidth, photoHeight);
-
-            // Adjust positions
-            //x += photoWidth + spacing;
-
-            // Check if we need to move to the next row
-            /*if (x + photoWidth > pageWidth) {
-              x = 20;
-              y += photoHeight + spacing + 10; // Add extra spacing for type name
-            }*
-            if (y + photoHeight > pageHeight) {
-              pdf.addPage(); // Add a new page
-              //x = 20; // Reset X position
-              y = 20; // Reset Y position
-            }
-            y += photoHeight + spacing + 10; // Extra spacing after each category
-
-            loadedPhotos++;
-
-            // Check if all photos are loaded
-            if (loadedPhotos === totalPhotos) {
-              this.savePDF(pdf, `${fileType} Certificate`);
-            }
-          };
-        });
-
-        // Move Y down for the next category
-      });*/
     },
   },
 };
@@ -629,4 +454,5 @@ export default {
 .v-container {
   padding-top: 20px;
 }
+
 </style>

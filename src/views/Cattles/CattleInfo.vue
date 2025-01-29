@@ -73,6 +73,7 @@
                   maxHeight: '300px',
                   width: '100%',
                   height: 'auto',
+                  border:'1px solid'
                 }"
                 :src="photoUrl"
               ></v-img>
