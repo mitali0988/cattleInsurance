@@ -52,8 +52,7 @@
               <v-col>
         <v-text-field
           v-model="time"
-          :active="menu2"
-          :focus="menu2"
+          @click="menu2 = true"
           label="Time of Death"
           readonly
         >
@@ -67,6 +66,7 @@
               v-if="menu2"
               v-model="time"
               full-width
+              @update:model-value="menu2 = false" 
             ></v-time-picker>
           </v-menu>
         </v-text-field>

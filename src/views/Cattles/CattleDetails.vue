@@ -303,9 +303,9 @@ export default {
     addPhotosToPDF(pdf, fileType) {
       //let x = 20;
       let y = 5; // Initial Y position
-      const photoWidth = 40;
-      const photoHeight = 40;
-      const spacing = 15;
+      const photoWidth = 38;
+      const photoHeight = 38;
+      const spacing = 8;
       const pageWidth = 190;
 
       // Function to render photos dynamically
@@ -320,39 +320,47 @@ export default {
       ) => {
         let x = startX;
         let y = startY;
-        const totalPhotos = Object.keys(photos).length;
-        let loadedPhotos = 0;
 
         pdf.text(title, x, (y += 10)); // Title for the photo section
         y += 10;
+        const photoTypes = ['left','right','front','back','tag'];
+        let index = 0;
+        const loadNextImage = () => {
+  if (index >= photoTypes.length) {
+    // After all images are processed, add text and call the completion callback
+    pdf.text(this.user.registrationCode, 180, 280, { align: "center" });
+    pdf.text(this.user.name, 180, 290, { align: "center" });
 
-        Object.entries(photos).forEach(([type, photoURL]) => {
-          const img = new Image();
-          img.src = photoURL;
+    onComplete?.(); // Callback when all photos are loaded
+    return;
+  }
 
-          img.onload = () => {
-            pdf.text(type, x, y + 5); // Add type name above the photo
-            pdf.addImage(img, "JPEG", x, y + 10, photoWidth, photoHeight);
+  const type = photoTypes[index]; // Get the current photo type
+  const img = new Image();
+  img.src = photos[type];
 
-            if (isHorizontal) {
-              x += photoWidth + spacing; // Move horizontally
-              if (x + photoWidth > pageWidth) {
-                x = startX; // Reset X position
-                y += photoHeight + spacing; // Move to the next row
-              }
-            } else {
-              y += photoHeight + spacing; // Move vertically
-            }
+  img.onload = () => {
+    pdf.text(type, x, y + 1); // Add type name above the photo
+    pdf.addImage(img, "JPEG", x, y + 3, photoWidth, photoHeight);
 
-            loadedPhotos++;
-            if (loadedPhotos === totalPhotos) {
-      pdf.text(this.user.registrationCode, 180, 270, { align: "center" });
-      pdf.text(this.user.name, 180, 280, { align: "center" });
+    if (isHorizontal) {
+      x += photoWidth + spacing; // Move horizontally
+      if (x + photoWidth > pageWidth) {
+        x = startX; // Reset X position
+        y += photoHeight + spacing; // Move to the next row
+      }
+    } else {
+      y += photoHeight + spacing; // Move vertically
+    }
 
-              onComplete?.(); // Callback when all photos are loaded
-            }
-          };
-        });
+    index++; // Move to the next photo type
+    loadNextImage(); // Recursively load the next image in order
+  };
+}
+
+// Start loading the first image
+loadNextImage();
+       
       };
 
       // Add a new page
@@ -363,7 +371,6 @@ export default {
 
       // Access photos by category
       const photosByCategory = this.cattle.photos;
-
       if (fileType === "Health") {
         renderPhotos(
           pdf,
@@ -400,7 +407,6 @@ export default {
           }
         );
       } else if (fileType === "Death") {
-        console.log("fffffffff", photosByCategory);
         renderPhotos(
           pdf,
           photosByCategory["health certificate"],
