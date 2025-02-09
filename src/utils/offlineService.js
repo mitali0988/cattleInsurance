@@ -38,10 +38,8 @@ export async function updateDairyOffline(data) {
   offlineQueue.push({ type: "update", data });
 }
 export async function deleteOfflineDairy(dairyId) {
-  const db = await getDB();
-  const tx = db.transaction(OFFLINE_STORE, "readwrite");
-  await tx.store.delete(dairyId);
-  await tx.done;
+  offlineQueue.push({ type: "delete", data: dairyId }); // Queue deletion
+  await deleteOfflineDairy(dairyId); // Remove from IndexedDB
 }
 export async function syncOfflineData() {
   while (offlineQueue.length) {
@@ -51,6 +49,8 @@ export async function syncOfflineData() {
         await axios.post(API_ROUTES.REGISTER_USER, action.data);
       } else if (action.type === "update") {
         await axios.put(API_ROUTES.UPDATE_USER, action.data);
+      } else if (action.type === "delete") {
+        await axios.delete(`${API_ROUTES.DELETE_USER}?id=${action.data}`);
       }
     } catch (error) {
       console.error("Failed to sync action:", action, error);

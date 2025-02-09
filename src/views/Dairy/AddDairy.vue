@@ -22,7 +22,7 @@
               label="Username"
               :rules="[rules.required]"
               required
-              :readonly="editDairy"
+              :readonly="editDairy != null"
             ></v-text-field>
 
             <v-btn :disabled="!valid" color="primary" @click="submitForm">
@@ -138,50 +138,7 @@ export default {
           this.errorMessage = "Failed to save offline.";
         }
       }
-      /* if (this.editDairy) {
-          dairyData.id = this.editDairy.id;
-          try {
-            const response = await axios.put(API_ROUTES.UPDATE_USER, dairyData);
-            this.successMessage =
-              response?.message || "Dairy updated successfully!";
-          } catch (error) {
-            this.errorMessage =
-              error.response?.data?.message || "An error occurred";
-          }
-        } else {
-          try {
-            const response = await axios.post(
-              API_ROUTES.REGISTER_USER,
-              dairyData
-            );
-            this.successMessage =
-              response?.message || "Dairy added successfully!";
-          } catch (error) {
-            this.errorMessage =
-              error.response?.data?.message || "An error occurred";
-          }
-        }
-        this.$emit("dairy-updated");
-        this.close();
-      } else {
-        if (this.editDairy) {
-          try {
-            await updateDairyOffline(dairyData);
-            this.successMessage = "Dairy saved offline. Will sync when online.";
-            this.clearForm();
-          } catch (error) {
-            this.errorMessage = "Could not update dairy offline.";
-          }
-        } else {
-          try {
-            await addDairyOffline(dairyData);
-            this.successMessage = "Dairy saved offline. Will sync when online.";
-            this.clearForm();
-          } catch (error) {
-            this.errorMessage = "Could not save dairy offline.";
-          }
-        }
-      }*/
+     
     },
   },
 };

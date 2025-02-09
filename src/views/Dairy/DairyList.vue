@@ -18,7 +18,7 @@
         <v-icon small color="blue" @click="openDairyModal(item)"
           >mdi-pencil</v-icon
         >
-        <v-icon small color="red" @click="deleteDairy(item.id)"
+        <v-icon small color="red" @click="handleDeleteDairy(item.id)"
           >mdi-delete</v-icon
         >
       </template>
@@ -70,12 +70,12 @@ export default {
     ...mapState("dairy", ["dairies"]),
   },
   methods: {
-    ...mapActions("dairy", ["fetchDairies", "deleteDairy", "addDairy"]),
+    ...mapActions("dairy", ["fetchDairies", "deleteDairy"]),
     openDairyModal(dairy = null) {
       this.editDairy = dairy;
       this.dairyModal = true;
     },
-    async deleteDairy(dairyId) {
+    async handleDeleteDairy(dairyId) {
       await this.deleteDairy(dairyId); // Use Vuex action to delete dairy
       this.fetchDairies(); // Refresh dairy list
     },
