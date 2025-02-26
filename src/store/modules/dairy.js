@@ -38,7 +38,7 @@ export default {
     async addDairy({ commit }, dairyData) {
       if (navigator.onLine) {
         const response = await axios.post(API_ROUTES.REGISTER_USER, dairyData);
-        commit("ADD_DAIRY", response.data);
+        commit("ADD_DAIRY", response?.data);
       } else {
         // Save to offline if no internet
         await saveDairiesOffline([dairyData]);

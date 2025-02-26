@@ -3,7 +3,7 @@
     <v-row class="d-flex justify-center">
       <v-col cols="12">
         <v-card>
-          <v-form ref="form">
+          <v-form ref="form" v-if="!cattleId">
             <!-- Two-column Layout -->
             <v-row>
               <v-col cols="12" md="6">
@@ -100,7 +100,7 @@
                 ></v-text-field>
               </v-col>
             </v-row>
-            <v-row v-if="!editCattle">
+            <!-- <v-row v-if="!editCattle">
               <FileUpload
                 :leftPhoto="leftPhoto"
                 :rightPhoto="rightPhoto"
@@ -109,22 +109,36 @@
                 :tagPhoto="tagPhoto"
                 @compressed="updateFile"
               />
-            </v-row>
+            </v-row> -->
 
             <!-- Submit Button -->
+
             <v-row>
               <v-col cols="12" class="text-center">
-                <v-btn
-                  :disabled="!isFormValid"
-                  color="primary"
-                  @click="submitForm"
-                >
+                <v-btn color="primary" @click="submitForm">
                   {{ editCattle ? "Update" : "Add" }}</v-btn
                 >
               </v-col>
             </v-row>
           </v-form>
-
+          <v-row v-if="cattleId && !editCattle">
+            <v-col cols="12" class="text-center">
+              <FileUpload
+                :leftPhoto="leftPhoto"
+                :rightPhoto="rightPhoto"
+                :frontPhoto="frontPhoto"
+                :backPhoto="backPhoto"
+                :tagPhoto="tagPhoto"
+                @compressed="updateFile"
+              />
+              <v-btn
+                :disabled="!isPhotoValid"
+                color="primary"
+                @click="savePhotos"
+                >Save Photos</v-btn
+              >
+            </v-col>
+          </v-row>
           <!-- Error and Success Messages -->
           <error-warning-message
             v-if="errorMessage"
@@ -172,12 +186,13 @@ export default {
       leftHorn: this.editCattle ? this.editCattle.leftHorn : "",
       value: this.editCattle ? this.editCattle.value : "",
       milk: this.editCattle ? this.editCattle.milk : "",
+      cattleId: null,
+      showFileUpload: false,
       leftPhoto: null,
       rightPhoto: null,
       frontPhoto: null,
       backPhoto: null,
       tagPhoto: null,
-      valid: false,
       errorMessage: "",
       successMessage: "",
       rules: {
@@ -200,12 +215,7 @@ export default {
 
   computed: {
     ...mapGetters("auth", ["user"]),
-    isFormValid() {
-      // Validate the form using v-form's built-in validate method
-      const isFormFilled = this.$refs.form?.validate();
-      if (this.editCattle) {
-        return isFormFilled;
-      }
+    isPhotoValid() {
       // Dynamically check if all photo fields are filled
       const arePhotosValid = [
         this.leftPhoto,
@@ -215,11 +225,40 @@ export default {
         this.tagPhoto,
       ].every((photo) => !!photo);
 
-      return isFormFilled && arePhotosValid;
+      return arePhotosValid;
+    },
+    isFormValid() {
+      return this.$refs.form ? this.$refs.form.validate() : false;
     },
   },
 
   methods: {
+    savePhotos() {
+      const formData = new FormData();
+      formData.append("photo_for", "health certificate");
+      console.log("dddddddd", this);
+      // Append photos to FormData
+      if (this.leftPhoto) formData.append("photos[left]", this.leftPhoto);
+      if (this.rightPhoto) formData.append("photos[right]", this.rightPhoto);
+      if (this.frontPhoto) formData.append("photos[front]", this.frontPhoto);
+      if (this.backPhoto) formData.append("photos[back]", this.backPhoto);
+      if (this.tagPhoto) formData.append("photos[tag]", this.tagPhoto);
+      formData.append("id", this.cattleId);
+      try {
+        const response = axios.post(API_ROUTES.UPDATE_CATTLE, formData, {
+          headers: {
+            "Content-Type": "multipart/form-data",
+          },
+          skipLoader: true,
+        });
+        console.log(response);
+        this.successMessage = "Photos added successfully!";
+      } catch (error) {
+        this.errorMessage =
+          error.response?.data?.message || "An error occurred";
+      }
+      this.$emit("cattle-updated");
+    },
     updateFile({ file, index }) {
       // Update the file for the corresponding index
       switch (index) {
@@ -245,15 +284,11 @@ export default {
     // Handle file upload and compression if needed
     async handleFileUpload(e) {
       const file = e.target.files[0];
-      console.log("1111111111", file);
       if (!file) return;
 
       // Check if file size exceeds 2 MB
       const maxSize = 1 * 1024 * 1024; // 2 MB in bytes
-      console.log("bbbbbbbbb", file.size);
-      console.log("ccccccccc", maxSize);
       if (file.size > maxSize) {
-        console.log("222222222222");
         try {
           const compressedFile = await this.compressFile(file);
           this.leftPhoto = compressedFile;
@@ -266,7 +301,6 @@ export default {
 
     // Compress image file if it's larger than 2 MB
     async compressFile(file) {
-      console.log("333333333333");
       const options = {
         maxSizeMB: 1, // 2 MB
         maxWidthOrHeight: 1920, // You can set a max width or height for the image
@@ -297,29 +331,9 @@ export default {
       Object.keys(this.$data).forEach((key) => {
         formData.append(key, this.$data[key]);
       });
-      console.log("aaaaaaaaaaa", this.leadId);
       // Add policyId and added_by to the formData
       formData.append("leadId", this.leadId);
       formData.append("added_by", this.user.id);
-      formData.append("photo_for", "health certificate");
-
-      // Append photos to FormData
-      if (this.leftPhoto) formData.append("photos[left]", this.leftPhoto);
-      if (this.rightPhoto) formData.append("photos[right]", this.rightPhoto);
-      if (this.frontPhoto) formData.append("photos[front]", this.frontPhoto);
-      if (this.backPhoto) formData.append("photos[back]", this.backPhoto);
-      if (this.tagPhoto) formData.append("photos[tag]", this.tagPhoto);
-
-      /*const cattleData = {
-        ...this.$data, // Automatically maps all fields from data
-        policyId: this.policyId,
-        added_by: this.user.id,
-      };
-      if (this.photos.length) {
-        this.photos.forEach((file, index) => {
-          cattleData.append(`photos[${index}]`, file);
-        });
-      }*/
 
       if (navigator.onLine) {
         if (this.editCattle) {
@@ -337,13 +351,15 @@ export default {
           }
         } else {
           try {
-            await axios.post(API_ROUTES.ADD_CATTLE, formData, {
+            const response = await axios.post(API_ROUTES.ADD_CATTLE, formData, {
               headers: {
                 "Content-Type": "multipart/form-data",
               },
             });
+            console.log("ererererer", response);
+            this.cattleId = response.data.cattle_id;
             this.successMessage = "Cattle added successfully!";
-            this.$emit("cattle-updated");
+            //  this.$emit("cattle-updated");
             //this.clearForm();
           } catch (error) {
             this.errorMessage =
@@ -351,7 +367,7 @@ export default {
               "An error occurred while submitting.";
           }
         }
-        this.$emit("cattle-updated");
+        //this.$emit("cattle-updated");
       } else {
         try {
           await addCattleOffline(formData);
@@ -362,18 +378,20 @@ export default {
         }
       }
     },
-
+    openFileUpload() {
+      this.showFileUpload = true;
+    },
     clearForm() {
       Object.keys(this.$data).forEach((key) => {
         if (typeof this.$data[key] === "string") this.$data[key] = "";
         if (Array.isArray(this.$data[key])) this.$data[key] = [];
         if (typeof this.$data[key] === "number") this.$data[key] = null;
       });
-      this.leftPhoto = null;
+      /*this.leftPhoto = null;
       this.rightPhoto = null;
       this.frontPhoto = null;
       this.backPhoto = null;
-      this.tagPhoto = null;
+      this.tagPhoto = null;*/
     },
   },
 };

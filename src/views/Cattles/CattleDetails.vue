@@ -279,11 +279,18 @@ export default {
         (yPos += 10)
       );
       if (type == "Death") {
-        pdf.text(`Reason of death: ${this.cattle.death_reason}`, 20, (yPos += 10));
-        pdf.text(`Place of death: ${this.cattle.death_place}`, 20, (yPos += 10));
+        pdf.text(
+          `Reason of death: ${this.cattle.death_reason}`,
+          20,
+          (yPos += 10)
+        );
+        pdf.text(
+          `Place of death: ${this.cattle.death_place}`,
+          20,
+          (yPos += 10)
+        );
         pdf.text(`Date of death: ${this.cattle.death_date}`, 20, (yPos += 10));
         pdf.text(`Time of death: ${this.cattle.death_time}`, 20, (yPos += 10));
-
       }
 
       let yPos2 = 90; // starting position
@@ -297,7 +304,8 @@ export default {
       pdf.text(`Approx Age(yrs): ${this.cattle.age} years`, 120, (yPos2 += 10));
       pdf.text(`Market Value: ${this.cattle.value}`, 120, (yPos2 += 10));
       pdf.text(`Milk(Ltr/Day): ${this.cattle.milk}`, 120, (yPos2 += 10));
-
+      pdf.text(this.user.registrationCode, 180, 250, { align: "center" });
+      pdf.text(this.user.name, 180, 260, { align: "center" });
       this.addPhotosToPDF(pdf, type);
     },
     addPhotosToPDF(pdf, fileType) {
@@ -323,49 +331,47 @@ export default {
 
         pdf.text(title, x, (y += 10)); // Title for the photo section
         y += 10;
-        const photoTypes = ['left','right','front','back','tag'];
+        const photoTypes = ["left", "right", "front", "back", "tag"];
         let index = 0;
         const loadNextImage = () => {
-  if (index >= photoTypes.length) {
-    // After all images are processed, add text and call the completion callback
-    pdf.text(this.user.registrationCode, 180, 280, { align: "center" });
-    pdf.text(this.user.name, 180, 290, { align: "center" });
+          if (index >= photoTypes.length) {
+            // After all images are processed, add text and call the completion callback
+            pdf.text(this.user.registrationCode, 180, 280, { align: "center" });
+            pdf.text(this.user.name, 180, 290, { align: "center" });
 
-    onComplete?.(); // Callback when all photos are loaded
-    return;
-  }
+            onComplete?.(); // Callback when all photos are loaded
+            return;
+          }
 
-  const type = photoTypes[index]; // Get the current photo type
-  const img = new Image();
-  img.src = photos[type];
+          const type = photoTypes[index]; // Get the current photo type
+          const img = new Image();
+          img.src = photos[type];
 
-  img.onload = () => {
-    pdf.text(type, x, y + 1); // Add type name above the photo
-    pdf.addImage(img, "JPEG", x, y + 3, photoWidth, photoHeight);
+          img.onload = () => {
+            pdf.text(type, x, y + 1); // Add type name above the photo
+            pdf.addImage(img, "JPEG", x, y + 3, photoWidth, photoHeight);
 
-    if (isHorizontal) {
-      x += photoWidth + spacing; // Move horizontally
-      if (x + photoWidth > pageWidth) {
-        x = startX; // Reset X position
-        y += photoHeight + spacing; // Move to the next row
-      }
-    } else {
-      y += photoHeight + spacing; // Move vertically
-    }
+            if (isHorizontal) {
+              x += photoWidth + spacing; // Move horizontally
+              if (x + photoWidth > pageWidth) {
+                x = startX; // Reset X position
+                y += photoHeight + spacing; // Move to the next row
+              }
+            } else {
+              y += photoHeight + spacing; // Move vertically
+            }
 
-    index++; // Move to the next photo type
-    loadNextImage(); // Recursively load the next image in order
-  };
-}
+            index++; // Move to the next photo type
+            loadNextImage(); // Recursively load the next image in order
+          };
+        };
 
-// Start loading the first image
-loadNextImage();
-       
+        // Start loading the first image
+        loadNextImage();
       };
 
       // Add a new page
       pdf.addPage();
-    
 
       //pdf.text("Photos:", x, (y += 10));
 
@@ -464,5 +470,4 @@ loadNextImage();
 .v-container {
   padding-top: 20px;
 }
-
 </style>

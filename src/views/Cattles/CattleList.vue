@@ -212,7 +212,7 @@ export default {
         console.error("No download link available");
       }
     },
-    async fetchData(calledFrom = '') {
+    async fetchData(calledFrom = "") {
       try {
         let cattlesResponse = [];
         if (this.user.role == "insurance") {
@@ -238,17 +238,17 @@ export default {
         }
 
         this.leads = cattlesResponse.data.cattles || [];
-       if(calledFrom != ''){
-        if(calledFrom == 'cattleModal'){
-          this.cattleModal = false;
+        if (calledFrom != "") {
+          if (calledFrom == "cattleModal") {
+            this.cattleModal = false;
+          }
+          if (calledFrom == "leadModal") {
+            this.leadModal = false;
+          }
+          if (calledFrom == "policyModel") {
+            this.policyModel = false;
+          }
         }
-        if(calledFrom == 'leadModal'){
-          this.leadModal = false;
-        }
-        if(calledFrom == 'policyModel'){
-          this.policyModel = false;
-        }
-       }
       } catch (error) {
         console.error("Error fetching data:", error);
       }

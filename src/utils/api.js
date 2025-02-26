@@ -16,7 +16,9 @@ api.interceptors.request.use((config) => {
   if (token) {
     config.headers.Authorization = `Bearer ${token}`;
   }
+  if (!config.skipLoader) {
   store.dispatch('loader/showLoader'); // Show loader via Vuex
+  }
   return config;
 }, (error) => {
   store.dispatch('loader/hideLoader'); // Hide loader on error
