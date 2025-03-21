@@ -14,12 +14,19 @@
                   :rules="[rules.required]"
                   required
                 ></v-text-field>
-                <v-text-field
+                <!--<v-text-field
                   v-model="breed"
                   label="Breed"
                   :rules="[rules.required]"
                   required
-                ></v-text-field>
+                ></v-text-field>-->
+                <v-select
+                  v-model="species"
+                  label="Animal Species"
+                  :items="speciesOptions"
+                  :rules="[rules.required]"
+                  required
+                ></v-select>
                 <v-text-field
                   v-model="rightHorn"
                   label="Right Horn"
@@ -33,8 +40,8 @@
                   required
                 ></v-text-field>
                 <v-text-field
-                  v-model="sumInsured"
-                  label="Sum Insured"
+                  v-model="value"
+                  label="Market Value"
                   type="number"
                   :rules="[rules.required]"
                   required
@@ -48,12 +55,20 @@
                 ></v-text-field>
               </v-col>
               <v-col cols="12" md="6">
-                <v-text-field
+                <!--<v-text-field
                   v-model="species"
                   label="Animal Species"
                   :rules="[rules.required]"
                   required
-                ></v-text-field>
+                ></v-text-field>-->
+                <v-select
+                  v-model="breed"
+                  label="Breed"
+                  :items="breedOptions"
+                  :rules="[rules.required]"
+                  required
+                ></v-select>
+
                 <v-text-field
                   v-model="color"
                   label="Body Color"
@@ -73,13 +88,20 @@
                   :rules="[rules.required]"
                   required
                 ></v-text-field>
+
                 <v-text-field
-                  v-model="value"
-                  label="Market Value"
+                  v-model="sumInsured"
+                  label="Sum Insured"
                   type="number"
-                  :rules="[rules.required]"
+                  :rules="[
+                    rules.required,
+                    (v) =>
+                      v <= value || 'Sum Insured cannot exceed Market Value',
+                  ]"
                   required
+                  :max="value"
                 ></v-text-field>
+
                 <v-text-field
                   v-model="milk"
                   label="Milk (ltr/day)"
@@ -165,7 +187,7 @@ import { mapGetters } from "vuex";
 import axios from "@/utils/api";
 import ErrorWarningMessage from "@/components/ErrorWarningMessage";
 import { API_ROUTES } from "@/utils/apiConstants";
-import { addCattleOffline } from "@/utils/offlineService";
+import { savePhotoOffline, addCattleOffline } from "@/utils/offlineService";
 import imageCompression from "browser-image-compression";
 import FileUpload from "@/components/FileUpload.vue";
 export default {
@@ -193,6 +215,8 @@ export default {
       frontPhoto: null,
       backPhoto: null,
       tagPhoto: null,
+      speciesOptions: ["Cow", "Buffalo", "Bullock", "Breeding Bull"],
+      breedOptions: [], // Will be updated dynamically
       errorMessage: "",
       successMessage: "",
       rules: {
@@ -206,6 +230,28 @@ export default {
           "Photo size should be < 2MB",
       ],
     };
+  },
+  watch: {
+    species(newSpecies) {
+      if (newSpecies === "Cow" || newSpecies === "Bullock") {
+        this.breedOptions = [
+          "Desi-Gir",
+          "H/F",
+          "Shahiwal",
+          "Jersi Cross",
+          "Non Described",
+        ];
+      } else {
+        this.breedOptions = [
+          "Mehsani",
+          "Surati",
+          "Murra",
+          "Bunny",
+          "Non Described",
+        ];
+      }
+      this.breed = ""; // Reset breed selection when species changes
+    },
   },
 
   components: {
@@ -244,18 +290,34 @@ export default {
       if (this.backPhoto) formData.append("photos[back]", this.backPhoto);
       if (this.tagPhoto) formData.append("photos[tag]", this.tagPhoto);
       formData.append("id", this.cattleId);
-      try {
-        const response = axios.post(API_ROUTES.UPDATE_CATTLE, formData, {
-          headers: {
-            "Content-Type": "multipart/form-data",
-          },
-          skipLoader: true,
-        });
-        console.log(response);
-        this.successMessage = "Photos added successfully!";
-      } catch (error) {
-        this.errorMessage =
-          error.response?.data?.message || "An error occurred";
+      if (navigator.onLine) {
+        try {
+          const response = axios.post(API_ROUTES.UPDATE_CATTLE, formData, {
+            headers: {
+              "Content-Type": "multipart/form-data",
+            },
+            skipLoader: true,
+          });
+          console.log(response);
+          this.successMessage = "Photos added successfully!";
+        } catch (error) {
+          this.errorMessage =
+            error.response?.data?.message || "An error occurred";
+        }
+      } else {
+        try {
+          savePhotoOffline({ photo: formData });
+
+          // Register a sync event to retry later
+          if (navigator.serviceWorker && "sync" in navigator.serviceWorker) {
+            navigator.serviceWorker.ready.then((registration) => {
+              registration.sync.register("sync-photo-uploads");
+            });
+          }
+        } catch (error) {
+          console.log(error);
+          this.errorMessage = "Failed to save offline.";
+        }
       }
       this.$emit("cattle-updated");
     },

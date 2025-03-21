@@ -1,10 +1,10 @@
 import axios from "@/utils/api";
-
+import { openDB } from "idb";
 import { API_ROUTES } from "./apiConstants";
 
 const offlineQueue = []; // Temporary in-memory queue
 const OFFLINE_STORE = "dairies";
-import { openDB } from "idb";
+const OFFLINE_PHOTO_STORE = "photoUploads";
 
 async function getDB() {
   return openDB("DairyAppDB", 1, {
@@ -12,10 +12,98 @@ async function getDB() {
       if (!db.objectStoreNames.contains(OFFLINE_STORE)) {
         db.createObjectStore(OFFLINE_STORE, { keyPath: "id" });
       }
+      if (!db.objectStoreNames.contains(OFFLINE_PHOTO_STORE)) {
+        db.createObjectStore(OFFLINE_PHOTO_STORE, { keyPath: "id", autoIncrement: true });
+      }
     },
   });
 }
 
+export async function savePhotoOffline(photo) {
+  const db = await getDB();
+  const tx = db.transaction(OFFLINE_PHOTO_STORE, "readwrite");
+  const offlineData = { 
+    photo: formDataToJson(photo) // Convert FormData to JSON
+  };
+  await tx.store.put(offlineData);
+  await tx.done;
+}
+
+// Retrieve all stored photos
+export async function getOfflinePhotos() {
+  const db = await getDB();
+  return db.getAll(OFFLINE_PHOTO_STORE);
+}
+
+// Sync photos when online
+export async function syncOfflinePhotos() {
+  try {
+    const db = await getDB();
+    if (!db.objectStoreNames.contains(OFFLINE_PHOTO_STORE)) {
+      console.error("Object store does not exist! Cannot sync offline photos.");
+      return;
+    }
+
+    
+  const photos = await getOfflinePhotos();
+  for (const photo of photos) {
+    try {
+      const formData = new FormData();
+      
+      // Convert JSON back to FormData
+      Object.keys(photo.photo).forEach((key) => {
+        if (photo.photo[key].startsWith("data:")) {
+          // Convert Base64 back to Blob
+          const byteCharacters = atob(photo.photo[key].split(",")[1]);
+          const byteNumbers = new Array(byteCharacters.length);
+          for (let i = 0; i < byteCharacters.length; i++) {
+            byteNumbers[i] = byteCharacters.charCodeAt(i);
+          }
+          const byteArray = new Uint8Array(byteNumbers);
+          const blob = new Blob([byteArray], { type: "image/jpeg" });
+          formData.append(key, blob, "offline-upload.jpg");
+        } else {
+          formData.append(key, photo.photo[key]);
+        }
+      });
+
+
+      await axios.post(API_ROUTES.UPDATE_CATTLE, formData, {
+        headers: {
+          "Content-Type": "multipart/form-data",
+        },
+        skipLoader: true,
+      });
+     // await axios.post("/api/upload-photo", photo);
+      console.log("Photo uploaded:", photo);
+    } catch (error) {
+      console.error("Photo upload failed:", error);
+    }
+  }
+} catch (error) {
+  console.error("Error syncing offline data:", error);
+}
+}
+
+function formDataToJson(formData) {
+  const json = {};
+  for (const [key, value] of formData.entries()) {
+    if (value instanceof Blob) {
+      // Convert Blob (file) to Base64 for storage
+      return new Promise((resolve) => {
+        const reader = new FileReader();
+        reader.readAsDataURL(value);
+        reader.onloadend = () => {
+          json[key] = reader.result; // Store as Base64 string
+          resolve(json);
+        };
+      });
+    } else {
+      json[key] = value;
+    }
+  }
+  return json;
+}
 // Save dairies offline
 export async function saveDairiesOffline(dairies) {
   const db = await getDB();

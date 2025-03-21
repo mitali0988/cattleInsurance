@@ -67,6 +67,18 @@
                   <v-icon>mdi-pencil</v-icon>
                 </v-btn>
                 <v-btn
+                  v-if="
+                    !item.policyNumber &&
+                    user.role == 'Doctor' &&
+                    showEditButton(item.date_added)
+                  "
+                  color="blue"
+                  icon
+                  @click="deleteCattle(item)"
+                >
+                  <v-icon>mdi-delete</v-icon>
+                </v-btn>
+                <v-btn
                   :to="`/cattle/${item.id}`"
                   color="blue"
                   class="text-white"
@@ -210,6 +222,14 @@ export default {
         window.open(item, "_blank"); // Open link in a new tab
       } else {
         console.error("No download link available");
+      }
+    },
+    async deleteCattle(item) {
+      try {
+        await axios.delete(`${API_ROUTES.DELETE_CATTLE}?id=${item.id}`);
+        this.fetchData();
+      } catch (error) {
+        console.error("Error fetching data:", error);
       }
     },
     async fetchData(calledFrom = "") {

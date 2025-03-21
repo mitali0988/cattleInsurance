@@ -242,6 +242,8 @@ export default {
       }
     },
     createCertificatePDF(pdf, img, type) {
+      const current_date = new Intl.DateTimeFormat("en-GB").format(new Date());
+      console.log("ddddddd", current_date);
       pdf.addImage(img, "JPEG", 0, 0, 210, 297); // Full page background (A4 size)
 
       pdf.setFontSize(16);
@@ -293,8 +295,8 @@ export default {
         pdf.text(`Time of death: ${this.cattle.death_time}`, 20, (yPos += 10));
       }
 
-      let yPos2 = 90; // starting position
-
+      let yPos2 = 80; // starting position
+      pdf.text(`Date : ${current_date}`, 120, (yPos2 += 10));
       pdf.text(`Post: ${this.cattle.post}`, 120, (yPos2 += 10));
       pdf.text(`District: ${this.cattle.district}`, 120, (yPos2 += 10));
       pdf.text(`Pincode: ${this.cattle.pincode}`, 120, (yPos2 += 10));

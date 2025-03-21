@@ -11,7 +11,7 @@
 <script>
 import AppLoader from "./components/AppLoader.vue";
 import { mapGetters } from "vuex";
-import { syncOfflineData } from "@/utils/offlineService";
+import { syncOfflinePhotos } from "@/utils/offlineService";
 export default {
   name: "App",
   created() {
@@ -33,8 +33,8 @@ export default {
     async handleOnlineEvent() {
       console.log("Detected online status. Starting offline data sync...");
       try {
-        await syncOfflineData();
-        this.$store.dispatch("dairy/fetchDairies");
+        await syncOfflinePhotos();
+        //this.$store.dispatch("dairy/fetchDairies");
         console.log("Offline data sync completed successfully.");
       } catch (error) {
         console.error("Error syncing offline data:", error);

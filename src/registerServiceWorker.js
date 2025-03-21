@@ -12,6 +12,11 @@ if (process.env.NODE_ENV === 'production') {
     },
     registered () {
       console.log('Service worker has been registered.')
+      navigator.serviceWorker.ready.then((registration) => {
+        if ("sync" in registration) {
+          registration.sync.register("sync-photo-uploads");
+        }
+      });
     },
     cached () {
       console.log('Content has been cached for offline use.')
@@ -30,3 +35,4 @@ if (process.env.NODE_ENV === 'production') {
     }
   })
 }
+
