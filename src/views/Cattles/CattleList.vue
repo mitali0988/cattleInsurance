@@ -6,10 +6,17 @@
         <v-btn color="primary" @click="openLeadModal">Add New Lead</v-btn>
       </v-col>
     </v-row>
-
+    <v-text-field
+      v-model="searchQuery"
+      label="Search Leads"
+      outlined
+      dense
+      clearable
+      class="mb-4"
+    />
     <!-- Grouped Cattle by Lead -->
     <v-expansion-panels>
-      <v-expansion-panel v-for="lead in leads" :key="lead.lead_id">
+      <v-expansion-panel v-for="lead in filteredLeads" :key="lead.lead_id">
         <v-expansion-panel-title>
           <div>
             <strong>Lead ID: {{ lead.lead_id }}</strong>
@@ -17,6 +24,11 @@
               - Policy: {{ lead.policyNumber }}</span
             >
             <span> - {{ lead.beneficiary_name }}</span>
+            <span> - Added By: {{ lead.name }}</span>
+            <span>
+              - On:
+              {{ new Date(lead.date_added).toLocaleDateString("en-GB") }}</span
+            >
           </div>
         </v-expansion-panel-title>
         <v-expansion-panel-text>
@@ -206,6 +218,25 @@ export default {
   },
   computed: {
     ...mapGetters("auth", ["user"]),
+    filteredLeads() {
+      if (!this.searchQuery) return this.leads;
+
+      const query = this.searchQuery.toLowerCase();
+      return this.leads.filter((lead) => {
+        return (
+          (lead.lead_id && lead.lead_id.toString().includes(query)) ||
+          (lead.beneficiary_name &&
+            lead.beneficiary_name.toLowerCase().includes(query)) ||
+          (lead.name && lead.name.toLowerCase().includes(query)) ||
+          (lead.policyNumber &&
+            lead.policyNumber.toLowerCase().includes(query)) ||
+          (lead.date_added &&
+            new Date(lead.date_added)
+              .toLocaleDateString("en-GB")
+              .includes(query))
+        );
+      });
+    },
   },
   methods: {
     viewCattle(cattle) {
