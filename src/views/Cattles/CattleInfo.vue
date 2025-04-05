@@ -50,9 +50,9 @@
     <v-col cols="12">
       <p><strong>Reason of death:</strong> {{ cattle.death_reason }}</p>
       <p><strong>Place of death:</strong> {{ cattle.death_place }}</p>
+      <p><strong>Illness Days:</strong> {{ cattle.ill_days }}</p>
       <p><strong>Date of death:</strong> {{ cattle.death_date }}</p>
       <p><strong>Time of death:</strong> {{ cattle.death_time }}</p>
-
     </v-col>
   </v-row>
   <v-row>
@@ -77,7 +77,7 @@
                   maxHeight: '300px',
                   width: '100%',
                   height: 'auto',
-                  border:'1px solid'
+                  border: '1px solid',
                 }"
                 :src="photoUrl"
               ></v-img>

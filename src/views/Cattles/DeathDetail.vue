@@ -19,59 +19,65 @@
                   :rules="[rules.required]"
                   required
                 ></v-text-field>
-
-              <v-col>
-                <!-- From Date Picker -->
-                <v-menu
-                  v-model="lossDateMenu"
-                  activator="parent"
-                  transition="scale-transition"
-                  :close-on-content-click="false"
-                  max-width="300"
-                  offset-y
-                >
-                  <template #activator="{ props }">
-                    <v-text-field
-                      v-model="lossDateDisplay"
-                      label="Date of loss"
-                      readonly
-                      v-bind="props"
-                      @click="lossDateMenu = true"
-                      :error="lossDateError"
-                      required
-                    ></v-text-field>
-                  </template>
-                  <v-date-picker
-                    v-model="lossDate"
-                    show-adjacent-months
-                    scrollable
-                    @update:model-value="selectLossDate"
-                  ></v-date-picker>
-                </v-menu>
+                <v-text-field
+                  v-model="illDays"
+                  label="Illness Days"
+                  type="number"
+                  :rules="[rules.required]"
+                  required
+                ></v-text-field>
+                <v-col>
+                  <!-- From Date Picker -->
+                  <v-menu
+                    v-model="lossDateMenu"
+                    activator="parent"
+                    transition="scale-transition"
+                    :close-on-content-click="false"
+                    max-width="300"
+                    offset-y
+                  >
+                    <template #activator="{ props }">
+                      <v-text-field
+                        v-model="lossDateDisplay"
+                        label="Date of loss"
+                        readonly
+                        v-bind="props"
+                        @click="lossDateMenu = true"
+                        :error="lossDateError"
+                        required
+                      ></v-text-field>
+                    </template>
+                    <v-date-picker
+                      v-model="lossDate"
+                      show-adjacent-months
+                      scrollable
+                      @update:model-value="selectLossDate"
+                    ></v-date-picker>
+                  </v-menu>
+                </v-col>
+                <v-col>
+                  <v-text-field
+                    v-model="time"
+                    @click="menu2 = true"
+                    label="Time of Death"
+                    readonly
+                  >
+                    <v-menu
+                      v-model="menu2"
+                      :close-on-content-click="false"
+                      activator="parent"
+                      transition="scale-transition"
+                    >
+                      <v-time-picker
+                        v-if="menu2"
+                        v-model="time"
+                        full-width
+                        @update:model-value="menu2 = false"
+                      ></v-time-picker>
+                    </v-menu>
+                  </v-text-field>
+                </v-col>
               </v-col>
-              <v-col>
-        <v-text-field
-          v-model="time"
-          @click="menu2 = true"
-          label="Time of Death"
-          readonly
-        >
-          <v-menu
-            v-model="menu2"
-            :close-on-content-click="false"
-            activator="parent"
-            transition="scale-transition"
-          >
-            <v-time-picker
-              v-if="menu2"
-              v-model="time"
-              full-width
-              @update:model-value="menu2 = false" 
-            ></v-time-picker>
-          </v-menu>
-        </v-text-field>
-              </v-col>
-      </v-col>
               <FileUpload
                 :leftPhoto="leftPhoto"
                 :rightPhoto="rightPhoto"
@@ -130,14 +136,15 @@ export default {
   data() {
     return {
       reason: "",
-      place:"",
+      place: "",
+      illDays: "",
       valid: false,
       lossDate: null, // Selected raw From Date
       lossDateDisplay: "", // Formatted From Date
       lossDateMenu: false, // From Date menu visibility
       lossDateError: false, // Tracks validation for "From Date"
-       time: null,
-        menu2: false,
+      time: null,
+      menu2: false,
       leftPhoto: null,
       rightPhoto: null,
       frontPhoto: null,
@@ -172,13 +179,17 @@ export default {
         this.rightPhoto &&
         this.frontPhoto &&
         this.backPhoto &&
-        this.tagPhoto&& this.lossDateDisplay&&this.reason&&this.place&&this.time
+        this.tagPhoto &&
+        this.lossDateDisplay &&
+        this.reason &&
+        this.place &&
+        this.time
       );
     },
   },
 
   methods: {
-     selectLossDate(date) {
+    selectLossDate(date) {
       if (date) {
         this.lossDate = date;
         this.lossDateDisplay = new Date(date).toLocaleDateString("en-CA"); // Format date for display

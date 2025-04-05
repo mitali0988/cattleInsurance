@@ -291,6 +291,7 @@ export default {
           20,
           (yPos += 10)
         );
+        pdf.text(`Illness Days: ${this.cattle.ill_days}`, 20, (yPos += 10));
         pdf.text(`Date of death: ${this.cattle.death_date}`, 20, (yPos += 10));
         pdf.text(`Time of death: ${this.cattle.death_time}`, 20, (yPos += 10));
       }
