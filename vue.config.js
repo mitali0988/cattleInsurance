@@ -57,6 +57,11 @@ module.exports = defineConfig({
       ],
     },
   },*/
+  devServer: {
+    host: '0.0.0.0',         // allow access from local network (mobile devices)
+    port: 8080,              // or any port you're using
+    allowedHosts: 'all',     // optional, avoids host validation issues
+  },
   pluginOptions: {
     vuetify: {
       // Vuetify plugin options

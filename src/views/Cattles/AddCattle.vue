@@ -1,128 +1,115 @@
 <template>
-  <v-container>
-    <v-row class="d-flex justify-center">
-      <v-col cols="12">
-        <v-card>
-          <v-form ref="form" v-if="!cattleId">
-            <!-- Two-column Layout -->
-            <v-row>
-              <v-col cols="12" md="6">
-                <v-text-field
-                  v-if="!editCattle"
-                  v-model="tagNo"
-                  label="Tag Number"
-                  :rules="[rules.required]"
-                  required
-                ></v-text-field>
-                <!--<v-text-field
-                  v-model="breed"
-                  label="Breed"
-                  :rules="[rules.required]"
-                  required
-                ></v-text-field>-->
-                <v-select
-                  v-model="species"
-                  label="Animal Species"
-                  :items="speciesOptions"
-                  :rules="[rules.required]"
-                  required
-                ></v-select>
-                <v-text-field
-                  v-model="rightHorn"
-                  label="Right Horn"
-                  :rules="[rules.required]"
-                  required
-                ></v-text-field>
-                <v-text-field
-                  v-model="switchOfTail"
-                  label="Switch Of Tail"
-                  :rules="[rules.required]"
-                  required
-                ></v-text-field>
-                <v-text-field
-                  v-model="value"
-                  label="Market Value"
-                  type="number"
-                  :rules="[rules.required]"
-                  required
-                ></v-text-field>
-                <v-text-field
-                  v-model="lactation"
-                  label="Lactation"
-                  type="number"
-                  :rules="[rules.required]"
-                  required
-                ></v-text-field>
-              </v-col>
-              <v-col cols="12" md="6">
-                <!--<v-text-field
-                  v-model="species"
-                  label="Animal Species"
-                  :rules="[rules.required]"
-                  required
-                ></v-text-field>-->
-                <v-select
-                  v-model="breed"
-                  label="Breed"
-                  :items="breedOptions"
-                  :rules="[rules.required]"
-                  required
-                ></v-select>
+  <v-card>
+    <v-form ref="form" v-if="!cattleId">
+      <!-- Two-column Layout -->
+      <v-row>
+        <v-col cols="12" md="6">
+          <v-text-field
+            v-if="!editCattle"
+            v-model="tagNo"
+            label="Tag Number"
+            :rules="[rules.required]"
+            required
+          ></v-text-field>
 
-                <v-text-field
-                  v-model="color"
-                  label="Body Color"
-                  :rules="[rules.required]"
-                  required
-                ></v-text-field>
-                <v-text-field
-                  v-model="leftHorn"
-                  label="Left Horn"
-                  :rules="[rules.required]"
-                  required
-                ></v-text-field>
-                <v-text-field
-                  v-model="age"
-                  label="Approx Age (yrs)"
-                  type="number"
-                  :rules="[rules.required]"
-                  required
-                ></v-text-field>
+          <v-select
+            v-model="species"
+            label="Animal Species"
+            :items="speciesOptions"
+            :rules="[rules.required]"
+            required
+            attach="body"
+          ></v-select>
+          <v-text-field
+            v-model="rightHorn"
+            label="Right Horn"
+            :rules="[rules.required]"
+            required
+          ></v-text-field>
+          <v-text-field
+            v-model="switchOfTail"
+            label="Switch Of Tail"
+            :rules="[rules.required]"
+            required
+          ></v-text-field>
+          <v-text-field
+            v-model="value"
+            label="Market Value"
+            type="number"
+            :rules="[rules.required]"
+            required
+          ></v-text-field>
+          <v-text-field
+            v-model="lactation"
+            label="Lactation"
+            type="number"
+            :rules="[rules.required]"
+            required
+          ></v-text-field>
+        </v-col>
+        <v-col cols="12" md="6">
+          <v-select
+            v-model="breed"
+            label="Breed"
+            :items="breedOptions"
+            :rules="[rules.required]"
+            required
+            attach="body"
+          ></v-select>
 
-                <v-text-field
-                  v-model="sumInsured"
-                  label="Sum Insured"
-                  type="number"
-                  :rules="[
-                    rules.required,
-                    (v) =>
-                      v <= value || 'Sum Insured cannot exceed Market Value',
-                  ]"
-                  required
-                  :max="value"
-                ></v-text-field>
+          <v-text-field
+            v-model="color"
+            label="Body Color"
+            :rules="[rules.required]"
+            required
+          ></v-text-field>
+          <v-text-field
+            v-model="leftHorn"
+            label="Left Horn"
+            :rules="[rules.required]"
+            required
+          ></v-text-field>
+          <v-text-field
+            v-model="age"
+            label="Approx Age (yrs)"
+            type="number"
+            :rules="[rules.required]"
+            required
+          ></v-text-field>
 
-                <v-text-field
-                  v-model="milk"
-                  label="Milk (ltr/day)"
-                  :rules="[rules.required]"
-                  required
-                ></v-text-field>
-              </v-col>
-            </v-row>
+          <v-text-field
+            v-model="sumInsured"
+            label="Sum Insured"
+            type="number"
+            :rules="[
+              rules.required,
+              (v) => v <= value || 'Sum Insured cannot exceed Market Value',
+            ]"
+            required
+            :max="value"
+          ></v-text-field>
 
-            <!-- Additional Fields -->
-            <v-row>
-              <v-col cols="12">
-                <v-text-field
-                  v-model="marks"
-                  label="Other Marks"
-                  :rules="[rules.required]"
-                  required
-                ></v-text-field>
-              </v-col>
-            </v-row>
-            <!-- <v-row v-if="!editCattle">
+          <v-text-field
+            v-model="milk"
+            label="Milk (ltr/day)"
+            :rules="[rules.required]"
+            required
+          ></v-text-field>
+        </v-col>
+      </v-row>
+
+      <!-- Additional Fields -->
+      <v-row>
+        <v-col cols="12">
+          <v-text-field
+            v-model="marks"
+            label="Other Marks"
+            :rules="[rules.required]"
+            required
+          ></v-text-field>
+        </v-col>
+      </v-row>
+      <!-- <v-row v-if="!editCattle">
               <FileUpload
                 :leftPhoto="leftPhoto"
                 :rightPhoto="rightPhoto"
@@ -133,53 +120,47 @@
               />
             </v-row> -->
 
-            <!-- Submit Button -->
+      <!-- Submit Button -->
 
-            <v-row>
-              <v-col cols="12" class="text-center">
-                <v-btn color="primary" @click="submitForm">
-                  {{ editCattle ? "Update" : "Add" }}</v-btn
-                >
-              </v-col>
-            </v-row>
-          </v-form>
-          <v-row v-if="cattleId && !editCattle">
-            <v-col cols="12" class="text-center">
-              <FileUpload
-                :leftPhoto="leftPhoto"
-                :rightPhoto="rightPhoto"
-                :frontPhoto="frontPhoto"
-                :backPhoto="backPhoto"
-                :tagPhoto="tagPhoto"
-                @compressed="updateFile"
-              />
-              <v-btn
-                :disabled="!isPhotoValid"
-                color="primary"
-                @click="savePhotos"
-                >Save Photos</v-btn
-              >
-            </v-col>
-          </v-row>
-          <!-- Error and Success Messages -->
-          <error-warning-message
-            v-if="errorMessage"
-            :message="errorMessage"
-            type="error"
-            :show="errorMessage !== ''"
-            @close="errorMessage = ''"
-          />
-          <error-warning-message
-            v-if="successMessage"
-            :message="successMessage"
-            type="success"
-            :show="successMessage !== ''"
-            @close="successMessage = ''"
-          />
-        </v-card>
+      <v-row>
+        <v-col cols="12" class="text-center">
+          <v-btn color="primary" @click="submitForm">
+            {{ editCattle ? "Update" : "Add" }}</v-btn
+          >
+        </v-col>
+      </v-row>
+    </v-form>
+    <v-row v-if="cattleId && !editCattle">
+      <v-col cols="12" class="text-center">
+        <FileUpload
+          :leftPhoto="leftPhoto"
+          :rightPhoto="rightPhoto"
+          :frontPhoto="frontPhoto"
+          :backPhoto="backPhoto"
+          :tagPhoto="tagPhoto"
+          @compressed="updateFile"
+        />
+        <v-btn :disabled="!isPhotoValid" color="primary" @click="savePhotos"
+          >Save Photos</v-btn
+        >
       </v-col>
     </v-row>
-  </v-container>
+    <!-- Error and Success Messages -->
+    <error-warning-message
+      v-if="errorMessage"
+      :message="errorMessage"
+      type="error"
+      :show="errorMessage !== ''"
+      @close="errorMessage = ''"
+    />
+    <error-warning-message
+      v-if="successMessage"
+      :message="successMessage"
+      type="success"
+      :show="successMessage !== ''"
+      @close="successMessage = ''"
+    />
+  </v-card>
 </template>
 
 <script>
@@ -216,7 +197,7 @@ export default {
       backPhoto: null,
       tagPhoto: null,
       speciesOptions: ["Cow", "Buffalo", "Bullock", "Breeding Bull"],
-      breedOptions: [], // Will be updated dynamically
+      breedOptions: [],
       errorMessage: "",
       successMessage: "",
       rules: {
@@ -232,8 +213,8 @@ export default {
     };
   },
   watch: {
-    species(newSpecies) {
-      if (newSpecies === "Cow" || newSpecies === "Bullock") {
+    species(newVal) {
+      if (newVal === "Cow" || newVal === "Bullock") {
         this.breedOptions = [
           "Desi-Gir",
           "H/F",
@@ -250,10 +231,9 @@ export default {
           "Non Described",
         ];
       }
-      this.breed = ""; // Reset breed selection when species changes
+      this.breed = "";
     },
   },
-
   components: {
     "error-warning-message": ErrorWarningMessage,
     FileUpload,

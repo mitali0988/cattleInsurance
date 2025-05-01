@@ -21,6 +21,7 @@ export const API_ROUTES = {
   ADD_CATTLE:`${BASE_URL}/Cattle/addCattle.php`,
   UPDATE_CATTLE:`${BASE_URL}/Cattle/updateCattle.php`,
   DELETE_CATTLE:`${BASE_URL}/Cattle/deleteCattle.php`,
+  DELETE_LEAD:`${BASE_URL}/Cattle/deleteLead.php`,
   ADD_LEAD:`${BASE_URL}/Cattle/addLead.php`,
   GET_LEADS:`${BASE_URL}/Cattle/getLeads.php`,
   GET_CATTLE:`${BASE_URL}/Cattle/getCattle.php`,

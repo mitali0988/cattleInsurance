@@ -458,6 +458,7 @@ export default {
                 false, // Vertical layout
                 () => {
                   this.savePDF(pdf, `${fileType} Certificate`);
+                  this.deathDetailModal = false;
                 }
               );
             }
